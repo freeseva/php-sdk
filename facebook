@@ -1,0 +1,52 @@
+include_once 'facebook.php';
+ 
+$facebook = new Facebook(array(
+    'appId' => '453388604731116',
+    'secret' => '88b124654a61bb9118a9214732fd0cb3',
+    'cookie' => true,
+    'domain' => 'www.softwareandfinance.com'
+));
+ 
+$app_name = "Broadcast to Friends";
+$app_url = "http://apps.facebook.com/Khalsa tagging/";
+ 
+$user_id = $facebook->getUser();
+ 
+if (!$user_id) {    
+    $url = $facebook->getLoginUrl(array(
+    'canvas' => 1,
+    'fbconnect' => 0
+     
+    ));
+ 
+} else
+{
+    try {
+        $permissions = $facebook->api("/me/permissions");
+        if(! array_key_exists('publish_stream', $permissions['data'][0]) ) { 
+            header( "Location: " . $facebook->getLoginUrl(array("scope" => "publish_stream")) );
+        } 
+ 
+        $permissions = $facebook->api("/me/permissions");
+ 
+        if( array_key_exists('publish_stream', $permissions['data'][0]) ) {
+            $friends = array();
+            $_friends = $facebook->api("/me/friends"); 
+ 
+            if (is_array($_friends) && count($_friends)) {
+                foreach ($_friends as $friend) { 
+                    $friends[] = $friend['uid'];
+                    $location = "/" . friend[uid] . "/feed";
+                    $post_id = $facebook->api($location, 'post', array('message'=>'Hello World!'));
+                    echo "posted on friend's wall" . $post_id;
+                }
+            }
+        }
+ 
+    } 
+    catch (FacebookApiException $e) 
+    {
+        echo "Error: Unable to post on your friend's wall";
+ 
+    }
+}
